@@ -1,0 +1,8 @@
+LLMs_for_CSS/
+__pycache__/
+*.pyc
+.DS_Store
+paper/*
+!paper/tables
+paper/tables/*
+!paper/tables/.gitkeep

@@ -1,0 +1,7 @@
+task,model,class,support,precision,recall,f1
+talklife,jev,A,166,0.444,0.024,0.046
+talklife,jev,B,166,0.418,0.169,0.240
+talklife,jev,C,166,0.363,0.922,0.520
+talklife,google_gemini-3.8-flash,A,166,0.389,0.042,0.076
+talklife,google_gemini-3.8-flash,B,166,0.417,0.151,0.221
+talklife,google_gemini-3.8-flash,C,166,0.360,0.910,0.515

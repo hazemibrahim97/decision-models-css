@@ -1,0 +1,17 @@
+task,ece_conf,ece_ptop
+conv_go_awry,0.3017,0.3424
+emotion,0.2812,0.3211
+flute,0.0387,0.0323
+ibc,0.1242,0.1680
+indian_english_dialect,0.0628,0.0630
+media_ideology,0.1250,0.1637
+mrf,0.1077,0.0898
+persuasion,0.1851,0.1920
+raop,0.1567,0.1882
+reddit_humor,0.1745,0.1912
+talklife,0.5379,0.5653
+tempowic,0.1699,0.1261
+tropes,0.1265,0.1246
+wiki_corpus,0.2328,0.2484
+wiki_politeness,0.1009,0.1388
+median,0.1567,0.1680
