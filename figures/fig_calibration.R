@@ -25,26 +25,42 @@ SHORT <- c(
   "qwen_qwen3-235b-a22b-2507" = "Qwen3 235B",
   "z-ai_glm-5.3" = "GLM 5.3")
 
-d <- read_csv("analysis/cell_metrics.csv", show_col_types = FALSE) %>%
-  filter(split == "confirmatory", !is.na(ece)) %>%
+main <- read_csv("analysis/cell_metrics.csv", show_col_types = FALSE) %>%
+  filter(split == "confirmatory", model %in% names(SHORT)) %>%
   mutate(class = case_when(model == "jev" ~ "jev",
                            kind == "local" ~ "local",
                            TRUE ~ "llm"),
-         name = SHORT[model])
+         name = SHORT[model], f1 = macro_f1)
 
-ord <- d %>% group_by(name, class) %>%
-  summarise(med = median(ece), .groups = "drop") %>% arrange(desc(med))
-d$name <- factor(d$name, levels = ord$name)
+OPEN <- c("local_opendecision" = "NLI-0.4B*", "local_verdict" = "Verdict-0.15B*",
+          "local_von" = "Von-0.4B*", "local_laya" = "Laya-0.4B*",
+          "local_decider-0.8b" = "decider-0.8b*", "local_decider-2b" = "decider-2b*",
+          "local_semif-4b" = "SemIf-4B*", "local_nimble-9b" = "Nimble-9B*",
+          "local_kev-0.8b" = "Kev-0.8B*", "local_kev-4b" = "Kev-4B*", "local_kev-9b" = "Kev-9B*")
+open <- read_csv("analysis/open_models.csv", show_col_types = FALSE) %>%
+  filter(model %in% names(OPEN), task %in% main$task) %>%
+  transmute(model, task, ece, f1, class = "open", name = OPEN[model])
+all <- bind_rows(main, open)
 
-p <- ggplot(d, aes(ece, name, colour = class)) +
-  geom_point(size = 1.3, alpha = 0.55) +
-  geom_point(data = ord, aes(med, name), shape = 124, size = 4, stroke = 1.2) +
-  scale_colour_manual(values = c(jev = COL_JEV, local = COL_LOCAL, llm = COL_LLM)) +
-  labs(x = "Expected calibration error (15 confirmatory tasks; bar = median)",
-       y = NULL) +
-  theme_dm() +
-  theme(axis.text.y = element_text(
-    colour = ifelse(ord$class == "jev", COL_JEV,
-                    ifelse(ord$class == "local", COL_LOCAL, "grey20"))))
+dotplot <- function(metric, xlab, best_low) {
+  d <- all %>% filter(!is.na(.data[[metric]])) %>% mutate(v = .data[[metric]])
+  ord <- d %>% group_by(name, class) %>%
+    summarise(med = median(v), .groups = "drop") %>%
+    arrange(if (best_low) desc(med) else med)
+  d$name <- factor(d$name, levels = ord$name)
+  ggplot(d, aes(v, name, colour = class)) +
+    geom_point(size = 1.3, alpha = 0.55) +
+    geom_point(data = ord, aes(med, name), shape = 124, size = 4, stroke = 1.2) +
+    scale_colour_manual(values = c(jev = COL_JEV, local = COL_LOCAL, open = COL_OPEN, llm = COL_LLM)) +
+    labs(x = xlab, y = NULL) +
+    theme_dm() +
+    theme(plot.margin = margin(5, 10, 5, 5),
+          axis.text.y = element_text(
+      colour = ifelse(ord$class == "jev", COL_JEV,
+                      ifelse(ord$class %in% c("local", "open"), COL_LOCAL, "grey20"))))
+}
 
-save_fig(p, "fig_calibration", w = 5.0, h = 3.6)
+save_fig(dotplot("ece", "ECE per evaluation task (bar = median)", TRUE),
+         "fig_calibration", w = 3.4, h = 5.6)
+save_fig(dotplot("f1", "Macro-F1 per evaluation task (bar = median)", FALSE),
+         "fig_accuracy", w = 3.4, h = 5.6)

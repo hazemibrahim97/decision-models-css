@@ -14,6 +14,8 @@ run_local_laya.py          Laya 0.4B encoder (local)
 run_local_decider.py       decider-0.8b / decider-2b (local)
 run_local_semif.py         SemIf-4B frozen logit readout (local, MLX)
 jubail_nimble/             Bespoke-Nimble-9B (Slurm, single A100)
+run_local_ecosystem.py     Von, Verdict, OpenDecision, Kev-0.8B/4B/9B (one runner, backend argument)
+jubail_kev/                Kev and OpenDecision Slurm jobs (single A100)
 run_structured_baseline.py Gemini 3.8 Flash structured-output control
 parse_llm_answer.py        Free-text answer + verbalized-confidence extraction
 results/pilot/             Per-call records, one JSONL per task x model
@@ -31,6 +33,14 @@ figures/                   R/ggplot2 figure scripts
 3. Python: 3.11+, `numpy`, `scipy`. Local model runners additionally need
    `torch`/`transformers` (and `mlx-lm` for SemIf). Figures need R with
    `ggplot2` and `patchwork`.
+4. Open decision systems run through each system's own released code:
+   Von from [wfzyx/von](https://github.com/wfzyx/von) (SDK 1.0.1, weights 1.1.0);
+   Verdict from [Heman10x-NGU/Verdict-open-jev](https://github.com/Heman10x-NGU/Verdict-open-jev)
+   (commit 30f1556, cloned into this directory; the runner loads `artifacts/v2`);
+   OpenDecision from PyPI (`OpenDecision==0.1.1`); Kev from
+   [jaredpalmer/kev](https://github.com/jaredpalmer/kev) (commit 557598f, served with
+   `kev.serve`; see `jubail_kev/kev_job.sbatch`). The exact version string each system
+   reported is stored in every record's `model_resolved` field.
 
 ## Reproducing the results
 

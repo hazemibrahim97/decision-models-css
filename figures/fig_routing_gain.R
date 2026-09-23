@@ -12,7 +12,8 @@ p <- ggplot(d, aes(x, gain)) +
   geom_point(aes(shape = split), colour = COL_JEV, size = 1.8) +
   geom_text_repel(aes(label = task), size = 2.0, family = "Helvetica",
                   colour = "grey40", seed = 20260920, max.overlaps = 20) +
-  scale_shape_manual(values = c(confirmatory = 16, discovery = 1)) +
+  scale_shape_manual(values = c(confirmatory = 16, discovery = 1),
+                     labels = c(confirmatory = "evaluation task", discovery = "pilot task")) +
   facet_wrap(~xvar, scales = "free_x") +
   labs(x = NULL, y = "Routing gain at t = 0.9 (acc@0.9 - base acc)") +
   theme_dm() +

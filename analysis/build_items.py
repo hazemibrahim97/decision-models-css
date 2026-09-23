@@ -23,6 +23,7 @@ CONF_RE = re.compile(
     r"confidence\s*[:=]?\s*\*{0,2}\s*(-)?\s*(\d+(?:\.\d+)?)\s*%?", re.I)
 
 def parse_confidence(text):
+
     matches = CONF_RE.findall(text)
     if not matches:
         return None, "absent"
@@ -35,6 +36,7 @@ def parse_confidence(text):
     return v / 100.0, "ok"
 
 def task_maps(task):
+
     j = load_task(task)
     if task in BINARY_GOLD:
         l2g = BINARY_GOLD[task]
@@ -120,7 +122,11 @@ if __name__ == "__main__":
 
     for m, expect in [("local_laya", 7863), ("local_decider-0.8b", 7863),
                       ("local_decider-2b", 7863), ("local_semif-4b", 7597),
-                      ("local_nimble-9b", 7863)]:
+                      ("local_nimble-9b", 7863),
+
+                      ("local_opendecision", 7863), ("local_verdict", 7863),
+                      ("local_von", 7863), ("local_kev-0.8b", 7863),
+                      ("local_kev-4b", 7863), ("local_kev-9b", 7863)]:
         got = counts[(m, "1")]
         assert got == expect, (m, got, expect)
     llm_conf = {m: c for (m, e), c in counts.items()

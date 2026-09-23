@@ -1,8 +1,9 @@
 library(ggplot2)
 
 COL_JEV   <- "#E69F00"
-COL_LOCAL <- "#56B4E9"
+COL_LOCAL <- "#009E73"
 COL_LLM   <- "grey45"
+COL_OPEN  <- COL_LOCAL
 COL_REF   <- "grey30"
 
 theme_dm <- function(base_size = 9) {

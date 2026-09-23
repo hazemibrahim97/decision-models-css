@@ -15,23 +15,29 @@ SHORT <- c(
   "deepseek_deepseek-v3.2" = "DeepSeek V3.2", "qwen_qwen3-235b-a22b-2507" = "Qwen3 235B",
   "z-ai_glm-5.3" = "GLM 5.3")
 
+OPEN <- c("local_verdict" = "Verdict-0.15B*", "local_laya" = "Laya-0.4B*",
+          "local_opendecision" = "NLI-0.4B*", "local_von" = "Von-0.4B*",
+          "local_decider-0.8b" = "decider-0.8b*", "local_kev-0.8b" = "Kev-0.8B*",
+          "local_decider-2b" = "decider-2b*", "local_semif-4b" = "SemIf-4B*",
+          "local_kev-4b" = "Kev-4B*", "local_nimble-9b" = "Nimble-9B*", "local_kev-9b" = "Kev-9B*")
+MAIN3 <- c("jev", "local_rlcd-0.6b", "local_qwen3-base")
+SHORT <- c(SHORT[MAIN3], OPEN, SHORT[setdiff(names(SHORT), MAIN3)])
+
 items <- read_csv(file.path(dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)[1])),
                             "..", "analysis", "items.csv"),
                   col_types = cols_only(task = "c", model = "c", kind = "c",
                                         conf = "d", conf_status = "c")) |>
-  filter(!(task %in% DISCOVERY), conf_status == "ok") |>
+  filter(!(task %in% DISCOVERY), conf_status == "ok", model %in% names(SHORT)) |>
   mutate(class = case_when(kind == "jev" ~ "jev", kind == "local" ~ "local", TRUE ~ "llm"),
-         label = factor(SHORT[model], levels = SHORT[c(
-           "jev", "local_rlcd-0.6b", "local_qwen3-base",
-           setdiff(names(SHORT), c("jev", "local_rlcd-0.6b", "local_qwen3-base")))]))
+         label = factor(SHORT[model], levels = SHORT))
 
 p <- ggplot(items, aes(conf, fill = class)) +
   geom_histogram(aes(y = after_stat(count / tapply(count, PANEL, sum)[PANEL])),
                  breaks = seq(0, 1, 0.05), colour = NA) +
   scale_fill_manual(values = c(jev = COL_JEV, local = COL_LOCAL, llm = COL_LLM)) +
-  facet_wrap(~label, ncol = 5) +
+  facet_wrap(~label, ncol = 6) +
   scale_x_continuous(breaks = c(0, 0.5, 1)) +
   labs(x = "Stated confidence", y = "Share of items") +
   theme_dm()
 
-save_fig(p, "fig_conf_hist", 7.2, 6.8)
+save_fig(p, "fig_conf_hist", 7.2, 7.6)

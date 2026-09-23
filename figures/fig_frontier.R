@@ -1,6 +1,7 @@
 suppressMessages({library(dplyr); library(readr); library(ggrepel); library(scales)
                   library(patchwork)})
 source(file.path(dirname(sub("--file=", "", grep("--file=", commandArgs(FALSE), value = TRUE)[1])), "theme.R"))
+
 d <- read_csv("analysis/frontier.csv", show_col_types = FALSE) %>%
   filter(kind != "local") %>%
   mutate(
@@ -29,6 +30,7 @@ d <- read_csv("analysis/frontier.csv", show_col_types = FALSE) %>%
       "deepseek_deepseek-v3.2" = "DeepSeek V3.2",
       "qwen_qwen3-235b-a22b-2507" = "Qwen3 235B",
       "z-ai_glm-5.3" = "GLM 5.3"))
+
 front <- d %>% arrange(cost_plot, desc(median_f1)) %>%
   filter(median_f1 == cummax(median_f1))
 
@@ -46,8 +48,9 @@ p <- ggplot(d, aes(cost_plot, median_f1)) +
   scale_x_log10(labels = label_dollar(accuracy = 0.01),
                 breaks = c(0.01, 0.1, 1, 10), limits = c(0.012, 20)) +
   labs(x = "Measured cost per 1,000 items (USD, log scale)",
-       y = "Median macro-F1 (15 confirmatory tasks)") +
+       y = "Median macro-F1 (15 evaluation tasks)") +
   theme_dm()
+
 cm <- read_csv("analysis/cell_metrics.csv", show_col_types = FALSE) %>%
   filter(split == "confirmatory", kind != "local") %>%
   mutate(eff_task = (macro_f1 * 100) / (cost / n * 1000 * 100))
